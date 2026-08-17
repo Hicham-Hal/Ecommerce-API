@@ -1,5 +1,4 @@
-import { JsonWebTokenError } from "jsonwebtoken"
-import User from "../models/User.model"
+import User from "../models/User.model.js"
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
@@ -14,8 +13,11 @@ export const login = async(req, res) => {
         const refreshToken = jwt.sign({id: user._id}, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' })
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,  
+            secure: true,
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000
         })
-        return res.status(200).json(user)
+        return res.status(200).json({ user, accessToken })
     }catch(err){
         console.log(err)
         return res.status(500).json({ error: 'Something went wrong' })
@@ -38,7 +40,15 @@ export const register = async(req, res) => {
             password: hashedPwd
         })
         await newUser.save()
-        return res.status(201).json({ message: 'User created successfully' })
+        const accessToken = jwt.sign({ id: newUser._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' })
+        const refreshToken = jwt.sign({id: newUser._id}, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' })
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,  
+            secure: true,
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        })
+        return res.status(201).json({ message: 'User created successfully', accessToken: accessToken })
     }catch(err){
         console.log(err)
         return res.status(500).json({ error: 'Something went wrong' })
@@ -47,7 +57,12 @@ export const register = async(req, res) => {
 
 export const logout = async(req, res) => {
     try{
-
+        res.clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict'
+        })
+        return res.status(200).json({ message: 'logged out successfully' })
     }catch(err){
         console.log(err)
         return res.status(500).json({ error: 'Something went wrong' })
@@ -55,8 +70,12 @@ export const logout = async(req, res) => {
 }
 
 export const refreshToken = async(req, res) => {
-    try{
 
+    try{
+        const token = req.cookies.refreshToken
+        const decode = await jwt.verify(token, process.env.REFRESH_TOKEN_SECRET)
+        const accessToken = jwt.sign({ id: decode.id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' })
+        return res.status(200).json({ accessToken })
     }catch(err){
         console.log(err)
         return res.status(500).json({ error: 'Something went wrong' })

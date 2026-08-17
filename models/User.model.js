@@ -13,7 +13,19 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    cart: []
+    cart: [{ 
+        product: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Product'
+        },
+        quantity: {
+            type: Number
+        }
+    }],
+    fav: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Product'
+    }]
 }, {timestamps: true})
 
 const User = mongoose.model('User', userSchema)

@@ -1,0 +1,71 @@
+import Product from "../models/Product.model.js";
+
+export const addProduct = async(req, res) => {
+    const { title, description, price, category, quantity } = req.body;
+    if(!title || !description || !price || !category || !quantity){
+        return res.status(400).json({ message: 'Fields are required' })
+    }
+    if(!req.file){
+        return res.status(400).json({ message: 'Image is required' })
+    }
+    try{
+        const product = new Product({
+            title,
+            description,
+            price,
+            image: req.file.filename,
+            category,
+            quantity
+        })
+        await product.save()
+        return res.status(201).json(product)
+    }catch(err){
+        console.log(err)
+        return res.status(500).json({ error: 'Something went wrong' })
+    }
+}
+
+export const updateProduct = async(req, res) => {
+    const { id } = req.params
+    const { title, description, price, category, quantity } = req.body;
+    try{
+        const product = await Product.findById(id)
+        if(!product) return res.status(404).json({ message: 'Product not found' })
+        product.title = title ? title : product.title
+        product.description = description? description : prodcut.description;
+        product.category = category? category: product.category;
+        product.price = price? price : product.price;
+        product.quantity = quantity ? quantity : product.quantity;
+        product.image = req.file ? req.file.filename : product.image
+
+        await product.save()
+        return res.status(200).json(product)
+    }catch(err){
+        console.log(err)
+        return res.status(500).json({ error: 'Something went wrongs' })
+    }
+}
+
+export const deleteProduct = async(req, res) => {
+    const { id } = req.params
+    try{
+        const product = await Product.findById(id)
+        if(!product) return res.status(404).json({ message: 'product not found' })
+        await product.deleteOne()
+        return res.status(204).send()
+    }catch(err){
+        console.log(err)
+        return res.status(500).json({ error: 'Something went wrong' })
+    }
+}
+
+export const getProducts = async(req, res) => {
+    try{
+        const products = await Product.find();
+        if(!products) return res.status(400).json({ message: 'Can\' get products' })
+        return res.status(200).json(products)
+    }catch(err){
+        console.log(err)
+        return res.status(500).json({ message: 'Something went wrong' })
+    }
+}
