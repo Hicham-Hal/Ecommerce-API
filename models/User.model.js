@@ -7,7 +7,8 @@ const userSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     password: {
         type: String,
@@ -16,10 +17,12 @@ const userSchema = new mongoose.Schema({
     cart: [{ 
         product: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Product'
+            ref: 'Product',
         },
         quantity: {
-            type: Number
+            type: Number,
+            default: 1,
+            min: 1
         }
     }],
     fav: [{
