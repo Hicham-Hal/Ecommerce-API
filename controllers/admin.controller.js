@@ -1,3 +1,4 @@
+import Order from "../models/Order.model.js";
 import Product from "../models/Product.model.js";
 
 export const addProduct = async(req, res) => {
@@ -32,7 +33,7 @@ export const updateProduct = async(req, res) => {
         const product = await Product.findById(id)
         if(!product) return res.status(404).json({ message: 'Product not found' })
         product.title = title ? title : product.title
-        product.description = description? description : prodcut.description;
+        product.description = description? description : product.description;
         product.category = category? category: product.category;
         product.price = price? price : product.price;
         product.quantity = quantity ? quantity : product.quantity;
@@ -67,5 +68,30 @@ export const getProducts = async(req, res) => {
     }catch(err){
         console.log(err)
         return res.status(500).json({ message: 'Something went wrong' })
+    }
+}
+
+export const getAllOrder = async(req, res) => {
+    try{
+        const orders = await Order.find();
+        return res.status(200).json(orders)
+    }catch(err){
+        console.log(err)
+        return res.status(500).json({ error: 'Something went wrong' })
+    }
+}
+
+export const updateOrderStatus = async(req, res) => {
+    const {orderStatus} = req.body
+    const {id} = req.params
+    try{
+        const order = await Order.findById(id)
+        if(!order) return res.status(404).json({ message: 'Order not found' })
+        order.orderStatus = orderStatus
+        await order.save()
+        return res.status(200).json(order)
+    }catch(err){
+        console.log(err)
+        return res.status(500).json({ error: 'Something went wrong' })
     }
 }
