@@ -92,3 +92,79 @@ describe('POST /fav-product', () => {
         expect(res.status).toBe(400)
     })
 })
+
+describe('POST /unfav-product', () => {
+    it('unfav product successfully', async() => {
+        const {token} = await createAuthedUser({ role: 'admin' })
+        const product = await createProduct(token, imagePath, 1)
+        const user = await request(app).post('/register').send({
+            name: 'user',
+            email: 'user@gmail.com',
+            password: 'user1234'
+        })
+        const login = await request(app).post('/login').send({
+            email: 'user@gmail.com',
+            password: 'user1234'
+        })
+        const accessToken = login.body.accessToken
+        const favProduct = await request(app).post('/fav-product').set('Authorization', `Bearer ${accessToken}`).send({
+            id: product._id
+        })
+
+        const res = await request(app).post('/unfav-product').set('Authorization', `Bearer ${accessToken}`).send({
+            id: product._id
+        })
+
+        expect(res.status).toBe(200)
+    }),
+
+    it('reject the unfav product if product doesn\'t exist', async() => {
+        const {token} = await createAuthedUser({ role: 'admin' })
+        const product = await createProduct(token, imagePath, 1)
+        const user = await createAuthedUser()
+
+        const res = await request(app).post('/unfav-product').set('Authorization', `Bearer ${user.token}`).send({
+            id: product._id
+        })
+
+        expect(res.status).toBe(400)
+    }),
+
+    it('reject the unfav product for unauthed user', async() => {
+        const {token} = await createAuthedUser({ role: 'admin' })
+        const product = await createProduct(token, imagePath, 1)
+
+        const res = await request(app).post('/unfav-product').send({
+            id: product._id
+        })
+
+        expect(res.status).toBe(401)
+    })
+})
+
+describe('POST /add-to-cart', () => {
+    it('add successfully to cart for authenticated user', async() => {
+        const {token} = await createAuthedUser({ role: 'admin' })
+        const product = await createProduct(token, imagePath, 1)
+        const user = await request(app).post('/register').send({
+            name: 'user',
+            email: 'user@gmail.com',
+            password: 'user1234'
+        })
+
+        const login = await request(app).post('/login').send({
+            email: 'user@gmail.com',
+            password: 'user1234'
+        })
+
+        const accessToken = login.body.accessToken
+        const userId = login.body.user._id
+
+        const res = await request(app).post('/addToCart').set('Authorization', `Bearer ${accessToken}`).send({
+            productId: product._id,
+            quantity: 1
+        })
+
+        expect(res.status).toBe(200)
+    })
+})

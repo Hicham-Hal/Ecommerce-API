@@ -19,7 +19,7 @@ export const addFavProduct = async(req, res) => {
     const { id } = req.body
     try{
         const user = await User.findById(req.user.id)
-        const exist = user.fav?.find(item => item.toString() === id)
+            const exist = user.fav?.find(item => item.toString() === id)
         if(exist){
             return res.status(400).json({ message: 'product already favorable', user })
         }
