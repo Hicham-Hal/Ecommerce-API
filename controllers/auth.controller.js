@@ -25,10 +25,7 @@ export const login = async(req, res) => {
 }
 
 export const register = async(req, res) => {
-    const {name, email, password} = req.body
-    if(!name || !email || !password){
-        return res.status(400).json('fields are required')
-    }
+    const {name, email, password, role} = req.body
     try{
         const user = await User.findOne({ email })
         if(user) return res.status(401).json({ message: 'Email already exist' })
@@ -37,7 +34,8 @@ export const register = async(req, res) => {
         const newUser = new User({
             name,
             email,
-            password: hashedPwd
+            password: hashedPwd,
+            role: role ? role : 'customer'
         })
         await newUser.save()
         const accessToken = jwt.sign({ id: newUser._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' })

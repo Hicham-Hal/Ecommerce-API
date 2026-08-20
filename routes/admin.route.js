@@ -5,12 +5,12 @@ import { validateToken } from '../lib/validToken.js'
 import { isAdmin } from '../lib/isAdmin.js'
 import { addProductValidator, deleteProductValidator, updateProductValidator } from '../validators/product.validator.js'
 import { validate } from '../validators/validate.js'
+import upload from '../middlewares/uploads.js'
 
-const upload = multer({ dest: 'images/' })
 const route = e.Router()
 
-route.post('/add-product', validateToken, isAdmin, addProductValidator, validate, upload.single('product'), addProduct)
-route.put('/product/:id', validateToken, isAdmin, updateProductValidator, validate, upload.single('product'), updateProduct)
+route.post('/add-product', validateToken, isAdmin, upload.single('product'), addProduct)
+route.put('/product/:id', validateToken, isAdmin, upload.single('product'), updateProduct)
 route.get('/products', validateToken, isAdmin, getProducts)
 route.delete('/product/:id', validateToken, isAdmin, deleteProductValidator, validate, deleteProduct)
 route.get('/orders', validateToken, isAdmin, getAllOrder)

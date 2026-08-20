@@ -17,7 +17,7 @@ route.post('/remove-cart', validateToken, removeAllFromCart)
 route.post('/increase-quantity', validateToken, increaseQuantity)
 route.post('/dicrease-quantity', validateToken, dicreaseQuantity)
 route.get('/fav-products', validateToken, getFavProduct)
-route.post('/checkout', validateToken, checkoutValidator, validate, checkout)
+route.post('/checkout', validateToken, checkoutValidator, validate, checkout) //checkout
 route.get('/order/:id', validateToken, getMyOrder)
 route.get('/orders', validateToken, getMyOrders)
 route.post('/cancel', validateToken, cancelOrder)

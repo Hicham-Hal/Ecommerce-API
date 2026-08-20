@@ -14,7 +14,7 @@ export const addProduct = async(req, res) => {
             title,
             description,
             price,
-            image: req.file.filename,
+            image: `/uploads/products/${req.file.filename}`,
             category,
             quantity
         })

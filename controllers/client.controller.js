@@ -8,7 +8,6 @@ export const getProductsPerCategory = async(req, res) => {
     console.log(cat)      
     try{
         const products = await Product.find({ category: cat })
-        if(!products) return res.status(400).json({ message: 'Can\' get products' })
         return res.status(200).json(products)
     }catch(err){
         console.log(err)
@@ -20,7 +19,6 @@ export const addFavProduct = async(req, res) => {
     const { id } = req.body
     try{
         const user = await User.findById(req.user.id)
-        // console.log(us)
         const exist = user.fav?.find(item => item.toString() === id)
         if(exist){
             return res.status(400).json({ message: 'product already favorable', user })

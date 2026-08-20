@@ -5,7 +5,7 @@ export const validate = (req, res, next) => {
     if(!errors.isEmpty()){
         return res.status(400).json({
             error: errors.array().map( e => ({
-                field: e.path, message: e.message
+                field: e.path, message: e.msg
             }))
         })
     }

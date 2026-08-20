@@ -15,7 +15,12 @@ export const registerValidator = [
     body('password')
         .notEmpty().withMessage('Password is required')
         .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
-        .matches('/\d/').withMessage('Password must contain at least one number')
+        .matches(/\d/).withMessage('Password must contain at least one number')
+
+    // body('role')
+    //     .trim()
+    //     .isIn(['admin', 'customer']).withMessage('Role must be admin or customer')
+
 ]
 
 export const loginValidator = [
@@ -27,4 +32,5 @@ export const loginValidator = [
 
     body('password')
         .notEmpty().withMessage('Password is required')
+
 ]

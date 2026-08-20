@@ -1,5 +1,6 @@
 import { configDotenv } from 'dotenv'
 import { connectDb } from './lib/connectDB..js';
+import app from './app.js';
 
 
 configDotenv()

@@ -8,12 +8,12 @@ export async function connectTestDb(){
     await mongoose.connect(mongod.getUri())
 }
 
-export async function closeTestDb(){
+export async function clearTestDb(){
     const collections = mongoose.connection.collections;
     for (const key in collections) await collections[key].deleteMany()
 }
 
-export async function clearTestDb(){
+export async function closeTestDb(){
     await mongoose.connection.dropDatabase()
     await mongoose.connection.close()
     await mongod.stop()
