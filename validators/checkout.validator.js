@@ -19,7 +19,4 @@ export const checkoutValidator = [
     body('shippingAddress.postalCode')
         .trim()
         .notEmpty().withMessage('postal code is required'),
-    body('shippingAddress.country')
-        .trim()
-        .notEmpty().withMessage('Country is required')
 ]
