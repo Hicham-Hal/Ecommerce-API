@@ -183,7 +183,6 @@ export const checkout = async(req, res) => {
 
         const items = []
         let totalAmount = 0;
-
         for(const cartItem of user.cart){
             const productId = cartItem.product;
             const product = await Product.findById(productId)
