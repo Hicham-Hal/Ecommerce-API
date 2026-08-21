@@ -15,7 +15,6 @@ describe('POST /register', ()=>{
             email: 'user@gmail.com',
             password: 'hicham123'
         })
-        console.log(res.body)
         expect(res.status).toBe(201)
         expect(res.body.accessToken).toBeDefined()
     }),

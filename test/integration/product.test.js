@@ -230,3 +230,92 @@ describe('GET /get-orders', () => {
         expect(res.status).toBe(401)
     })
 })
+
+describe('PUT /order/:id', () => {
+    it('update an order status successfully', async() => {
+        const {token} = await createAuthedUser({ role: 'admin' })
+        const product = await createProduct(token, fixturePath, 2)
+        const user = await createAuthedUser()
+        const productId = product._id
+        const addToCart = await request(app).post('/addToCart').set('Authorization', `Bearer ${user.token}`).send({
+            productId,
+            quantity: 1
+        })
+
+        const order = await request(app).post('/checkout').set('Authorization', `Bearer ${user.token}`).send({
+            shippingAddress:{
+                street: 'fs',
+                city: 'fdsfa',
+                state: 'fdsfa',
+                postalCode: '16234',
+                country: 'algeria'
+            },
+            paymentMethod: 'cod'
+        })
+        const id = order.body.newOrder._id
+
+        const res = await request(app).put(`/dashboard/order/${id}`).set('Authorization', `Bearer ${token}`).send({
+            orderStatus: 'processing'
+        })
+
+        expect(res.status).toBe(200)
+        expect(res.body)
+        expect(res.body.orderStatus).toBe('processing')
+    }),
+    it('reject updating an order status for non admin account', async() => {
+        const {token} = await createAuthedUser({ role: 'admin' })
+        const product = await createProduct(token, fixturePath, 1)
+        const user = await createAuthedUser()
+        const productId = product._id
+        const addToCart = await request(app).post('/addToCart').set('Authorization', `Bearer ${user.token}`).send({
+            productId,
+            quantity: 1
+        })
+
+        const order = await request(app).post('/checkout').set('Authorization', `Bearer ${user.token}`).send({
+            shippingAddress:{
+                street: 'fs',
+                city: 'fdsfa',
+                state: 'fdsfa',
+                postalCode: '16234',
+                country: 'algeria'
+            },
+            paymentMethod: 'cod'
+        })
+        const id = order.body.newOrder._id
+
+        const res = await request(app).put(`/dashboard/order/${id}`).set('Authorization', `Bearer ${user.token}`).send({
+            orderStatus: 'processing'
+        })
+
+        expect(res.status).toBe(403)
+    }),
+
+    it('reject updating an order status for a non valid orderId', async() => {
+        const {token} = await createAuthedUser({ role: 'admin' })
+        const product = await createProduct(token, fixturePath, 2)
+        const user = await createAuthedUser()
+        const productId = product._id
+        const addToCart = await request(app).post('/addToCart').set('Authorization', `Bearer ${user.token}`).send({
+            productId,
+            quantity: 1
+        })
+
+        const order = await request(app).post('/checkout').set('Authorization', `Bearer ${user.token}`).send({
+            shippingAddress:{
+                street: 'fs',
+                city: 'fdsfa',
+                state: 'fdsfa',
+                postalCode: '16234',
+                country: 'algeria'
+            },
+            paymentMethod: 'cod'
+        })
+
+        const res = await request(app).put(`/dashboard/order/${productId}`).set('Authorization', `Bearer ${user.token}`).send({
+            orderStatus: 'processing'
+        })
+
+        expect(res.status).toBe(403)
+    })
+})
