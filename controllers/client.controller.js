@@ -1,3 +1,4 @@
+import { createChargilyCheckout } from "../lib/chargily.js"
 import Order from "../models/Order.model.js"
 import Product from "../models/Product.model.js"
 import User from "../models/User.model.js"
@@ -213,17 +214,29 @@ export const checkout = async(req, res) => {
         })
         await newOrder.save()
 
+        if(paymentMethod !== 'stripe'){
 
-        //decrement stock
-        for (const item of items){
-            await Product.findByIdAndUpdate(item.product, {
-                $inc: { quantity: -item.quantity }
-            })
+            //decrement stock
+            for (const item of items){
+                await Product.findByIdAndUpdate(item.product, {
+                    $inc: { quantity: -item.quantity }
+                })
+            }
+            user.cart = []
+            await user.save()
+            res.status(200).json({newOrder, user})
         }
-        user.cart = []
-        await user.save()
+        //online: create a chargily checkout
 
-        res.status(200).json({newOrder, user})
+        const chargilyCheckout = await createChargilyCheckout({
+            totalAmount,
+            orderId: newOrder._id
+        })
+
+        newOrder.chargilyCheckoutId = chargilyCheckout.id
+        await newOrder.save()
+
+        return res.status(200).json({ newOrder, checkout_url: chargilyCheckout.checkout_url })
         
     }catch(err){
         console.log(err)

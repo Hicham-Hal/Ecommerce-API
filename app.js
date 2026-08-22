@@ -4,10 +4,12 @@ import authRoute from './routes/auth.route.js'
 import adminRoute from './routes/admin.route.js'
 import clientRoute from './routes/client.route.js'
 import cookieParser from 'cookie-parser';
+import paymentRoute from './routes/payment.route.js'
 
 const app = e()
 
 
+app.use('/payment', paymentRoute)
 app.use(e.json())
 app.use(cookieParser())
 app.use(e.urlencoded({ extended: false }))
